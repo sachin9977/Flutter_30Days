@@ -13,10 +13,13 @@ class _FirstScreenState extends State<FirstScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+          backgroundColor: Colors.teal,
+          elevation: 6,
+          shadowColor: Colors.black,
           title: const Text(
-        "Data Flow Routing",
-        style: TextStyle(color: Colors.white),
-      )),
+            "Data Flow Routing",
+            style: TextStyle(color: Colors.white),
+          )),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -24,7 +27,7 @@ class _FirstScreenState extends State<FirstScreen> {
             child: TextButton(
               onPressed: () => _navigate(context),
               style: const ButtonStyle(
-                  backgroundColor: MaterialStatePropertyAll(Colors.black)),
+                  backgroundColor: MaterialStatePropertyAll(Colors.teal)),
               child: const Text(
                 "Go To Second Screen",
                 style: TextStyle(color: Colors.white),

@@ -16,8 +16,12 @@ class _SecondScreenState extends State<SecondScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.teal,
+        elevation: 6,
+        shadowColor: Colors.black,
         title: Text(
           widget.s,
+          style: const TextStyle(color: Colors.white),
         ),
       ),
       body: Column(
@@ -29,7 +33,7 @@ class _SecondScreenState extends State<SecondScreen> {
               Navigator.pop(context, 'Yeah!!');
             },
             style: const ButtonStyle(
-                backgroundColor: MaterialStatePropertyAll(Colors.black)),
+                backgroundColor: MaterialStatePropertyAll(Colors.teal)),
             child: const Text(
               "Return Yes",
               style: TextStyle(color: Colors.white),
@@ -42,7 +46,7 @@ class _SecondScreenState extends State<SecondScreen> {
                 Navigator.pop(context, 'Nope!!');
               },
               style: const ButtonStyle(
-                  backgroundColor: MaterialStatePropertyAll(Colors.black)),
+                  backgroundColor: MaterialStatePropertyAll(Colors.teal)),
               child: const Text(
                 "Return No",
                 style: TextStyle(color: Colors.white),
