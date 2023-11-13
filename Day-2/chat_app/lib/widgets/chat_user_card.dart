@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chat_app/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_app/main.dart';
 import 'package:chat_app/models/chat_user.dart';
@@ -19,7 +20,15 @@ class _ChatUserCardState extends State<ChatUserCard> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       margin: EdgeInsets.symmetric(horizontal: mq.width * .03, vertical: 4),
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChatScreen(
+                  user: widget.user,
+                ),
+              ));
+        },
         child: ListTile(
             leading: ClipRRect(
               borderRadius: BorderRadius.circular(mq.height * .3),
