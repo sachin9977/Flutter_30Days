@@ -1,4 +1,5 @@
 import 'package:chat_app/api/apis.dart';
+import 'package:chat_app/helper/my_date_util.dart';
 import 'package:chat_app/main.dart';
 import 'package:chat_app/models/message.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,13 @@ class _msgCardState extends State<msgCard> {
 
 // Sender or another user
   Widget _blueMessage() {
+    //  update last read message if sender and receiver are different.
+
+    if (widget.message.read.isEmpty) {
+      APIs.updateMessageReadStatus(widget.message);
+      print("Message read updated");
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -42,10 +50,12 @@ class _msgCardState extends State<msgCard> {
             ),
           ),
         ),
+        // Sent Time
         Padding(
           padding: EdgeInsets.only(right: mq.width * .04),
           child: Text(
-            widget.message.sent,
+            MyDateUtil.getFormatedTime(
+                context: context, time: widget.message.sent),
             style: TextStyle(fontSize: 13, color: Colors.black54),
           ),
         ),
@@ -63,16 +73,18 @@ class _msgCardState extends State<msgCard> {
             SizedBox(
               width: mq.width * .04,
             ),
-            Icon(
-              Icons.done_all_rounded,
-              color: Colors.blue,
-              size: 20,
-            ),
+            if (widget.message.read.isNotEmpty)
+              Icon(
+                Icons.done_all_rounded,
+                color: Colors.blue,
+                size: 20,
+              ),
             SizedBox(
               width: mq.width * .02,
             ),
             Text(
-              widget.message.sent,
+              MyDateUtil.getFormatedTime(
+                  context: context, time: widget.message.sent),
               style: TextStyle(fontSize: 13, color: Colors.black54),
             ),
           ],
