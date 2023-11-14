@@ -3,6 +3,7 @@ import 'package:chat_app/api/apis.dart';
 import 'package:chat_app/helper/my_date_util.dart';
 import 'package:chat_app/models/message.dart';
 import 'package:chat_app/screens/chat_screen.dart';
+import 'package:chat_app/widgets/dialogs/profile_dailog.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_app/main.dart';
 import 'package:chat_app/models/chat_user.dart';
@@ -46,21 +47,33 @@ class _ChatUserCardState extends State<ChatUserCard> {
               if (list.isNotEmpty) _message = list[0];
 
               return ListTile(
-                  leading: ClipRRect(
-                    borderRadius: BorderRadius.circular(mq.height * .3),
-                    child: CachedNetworkImage(
-                      width: mq.height * .055,
-                      height: mq.height * .055,
-                      imageUrl: widget.user.image,
-                      // placeholder: (context, url) => CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => CircleAvatar(
-                        child: Icon(CupertinoIcons.person),
+                  leading: InkWell(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => ProfileDialog(user: widget.user),
+                      );
+                    },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(mq.height * .3),
+                      child: CachedNetworkImage(
+                        width: mq.height * .055,
+                        height: mq.height * .055,
+                        imageUrl: widget.user.image,
+                        // placeholder: (context, url) => CircularProgressIndicator(),
+                        errorWidget: (context, url, error) => CircleAvatar(
+                          child: Icon(CupertinoIcons.person),
+                        ),
                       ),
                     ),
                   ),
                   title: Text(widget.user.name),
                   subtitle: Text(
-                    _message != null ? _message!.msg : widget.user.about,
+                    _message != null
+                        ? _message!.type == Type.image
+                            ? 'Image'
+                            : _message!.msg
+                        : widget.user.about,
                     maxLines: 1,
                   ),
                   trailing: _message == null

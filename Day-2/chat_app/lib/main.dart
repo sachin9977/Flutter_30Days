@@ -37,9 +37,11 @@
 //   }
 // }
 
+import 'dart:collection';
 import 'dart:developer';
 
 import 'package:chat_app/screens/auth/login_screen.dart';
+import 'package:chat_app/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -69,13 +71,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'We Chat',
-        debugShowCheckedModeBanner: false,
+        title: 'Baat-Chit',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           // useMaterial3: true,
         ),
-        home: LoginScreen());
+        home: SplashScreen());
   }
 }
 
