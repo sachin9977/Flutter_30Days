@@ -223,7 +223,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       },
                       icon: Icon(
                         Icons.emoji_emotions,
-                        color: Colors.blueAccent,
+                        color: Colors.deepPurple,
                         size: 26,
                       )),
                   Expanded(
@@ -241,7 +241,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       decoration: InputDecoration(
                           hintText: "Type Something....",
                           hintStyle: TextStyle(
-                            color: Colors.blueAccent,
+                            color: Colors.black,
                           ),
                           border: InputBorder.none),
                     ),
@@ -269,7 +269,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       },
                       icon: Icon(
                         Icons.image,
-                        color: Colors.blueAccent,
+                        color: Colors.deepPurple,
                         size: 26,
                       )),
                   IconButton(
@@ -292,7 +292,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       },
                       icon: Icon(
                         Icons.camera_alt_rounded,
-                        color: Colors.blueAccent,
+                        color: Colors.deepPurple,
                         size: 26,
                       )),
                 ],
@@ -306,7 +306,15 @@ class _ChatScreenState extends State<ChatScreen> {
             color: Colors.deepPurple,
             onPressed: () {
               if (_textController.text.isNotEmpty) {
-                APIs.sendMessage(widget.user, _textController.text, Type.text);
+                if (_list.isEmpty) {
+                  // on first message (add user to my_user collection of chat user)
+                  APIs.sendFirstMsg(
+                      widget.user, _textController.text, Type.text);
+                } else {
+                  // Simple send msg
+                  APIs.sendMessage(
+                      widget.user, _textController.text, Type.text);
+                }
                 _textController.text = '';
               }
             },

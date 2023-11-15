@@ -1,12 +1,9 @@
-import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chat_app/api/apis.dart';
 import 'package:chat_app/helper/my_date_util.dart';
 import 'package:chat_app/main.dart';
 import 'package:chat_app/models/chat_user.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
 class ViewProfileScreen extends StatefulWidget {
   final ChatUser user;

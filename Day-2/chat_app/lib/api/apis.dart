@@ -38,35 +38,70 @@ class APIs {
         print('rttttttttttttttttttttttt');
       }
     });
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Got a message whilst in the foreground!');
+      print('Message data: ${message.data}');
+
+      if (message.notification != null) {
+        print('Message also contained a notification: ${message.notification}');
+      }
+    });
   }
 
 // For Sending Push Notification
   static Future<void> sendPushNotification(
       ChatUser chatUser, String msg) async {
-   try {
+    try {
       final body = {
-      "to": chatUser.pushToken,
-      "notification": {"title": chatUser.name, "body": msg}
-    };
-    // var url = Uri.https('example.com', 'whatsit/create');
-    var res = await post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-          HttpHeaders.authorizationHeader:
-              'key=AAAAOPyl00U:APA91bEpbQDtOHpFxPQ_p_AaLQT8mDaxOk1sXDrAqfgLBcnLXm_UpI6H5wU_fgmnuRenf1zBw2NGAtr_cPLkKzABBurI1-6XHSM6So3RC7ocYbj7TuEsvUh_OlQgWRQ3ktkvNrsEHbV1'
+        "to": chatUser.pushToken,
+        "notification": {
+          "title": user.displayName,
+          "body": msg,
+          "android_channel_id": "chats",
         },
-        body: jsonEncode(body));
-    print('Response status: ${res.statusCode}');
-    print('Response body: ${res.body}');
-   } catch (e) {
-     print(e);
-     print("SendNotification");
-   }
+        "data": {
+          "some_data": "User ID: ${me.id} ",
+        },
+      };
+      // var url = Uri.https('example.com', 'whatsit/create');
+      var res = await post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+          headers: {
+            HttpHeaders.contentTypeHeader: 'application/json',
+            HttpHeaders.authorizationHeader:
+                'key=AAAAOPyl00U:APA91bEpbQDtOHpFxPQ_p_AaLQT8mDaxOk1sXDrAqfgLBcnLXm_UpI6H5wU_fgmnuRenf1zBw2NGAtr_cPLkKzABBurI1-6XHSM6So3RC7ocYbj7TuEsvUh_OlQgWRQ3ktkvNrsEHbV1'
+          },
+          body: jsonEncode(body));
+      print('Response status: ${res.statusCode}');
+      print('Response body: ${res.body}');
+    } catch (e) {
+      print(e);
+      print("SendNotification");
+    }
   }
 
   //  For checking if user exists or not?
   static Future<bool> userExists() async {
     return (await firestore.collection('users').doc(user.uid).get()).exists;
+  }
+
+  //  For adding a chat user for our conversation
+  static Future<bool> addChatUser(String email) async {
+    final data = await firestore
+        .collection('users')
+        .where('email', isEqualTo: email)
+        .get();
+    if (data.docs.isNotEmpty && data.docs.first.id != user.uid) {
+      await firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('my_users')
+          .doc(data.docs.first.id)
+          .set({});
+
+      return true;
+    } else {
+      return false;
+    }
   }
 
   //  For getting current user info
@@ -103,12 +138,59 @@ class APIs {
         .set(chatUser.toJson());
   }
 
+  // // For getting all users from firestore database
+  // static Stream<QuerySnapshot<Map<String, dynamic>>> getAllUsers(
+  //     List<String> userIds) {
+  //   return APIs.firestore
+  //       .collection('users')
+  //       .where('id', whereIn: userIds)
+  //       .snapshots();
+  // }
+
+  // // For getting id's of known user from firestore database
+  // static Stream<QuerySnapshot<Map<String, dynamic>>> getMyUserId() {
+  //   return APIs.firestore
+  //       .collection('users')
+  //       .doc(user.uid)
+  //       .collection('my_users')
+  //       .snapshots();
+  // }
+
   // For getting all users from firestore database
-  static Stream<QuerySnapshot<Map<String, dynamic>>> getAllUsers() {
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getAllUsers(
+      List<String> userIds) {
+    if (userIds.isNotEmpty) {
+      // Add a check here
+      return APIs.firestore
+          .collection('users')
+          .where('id', whereIn: userIds)
+          .snapshots();
+    } else {
+      // Return an empty stream or handle the case where userIds is empty
+      return Stream.empty();
+    }
+  }
+
+// For getting id's of known user from firestore database
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getMyUserId() {
     return APIs.firestore
         .collection('users')
-        .where('id', isNotEqualTo: user.uid)
+        .doc(user.uid)
+        .collection('my_users')
         .snapshots();
+  }
+
+// for adding an user to my user when first msg is send.
+  static Future<void> sendFirstMsg(
+      ChatUser chatuser, String msg, Type type) async {
+    await firestore
+        .collection('users')
+        .doc(chatuser.id)
+        .collection('my_users')
+        .doc(user.uid)
+        .set({}).then((value) {
+      sendMessage(chatuser, msg, type);
+    });
   }
 
   //  For Updating user info
@@ -191,7 +273,8 @@ class APIs {
 
     final ref = firestore
         .collection('chats/${getConversationID(chatuser.id)}/message/');
-    await ref.doc(time).set(message.toJson()).then((value) => sendPushNotification(chatuser, type == Type.text ? msg : 'image' ));
+    await ref.doc(time).set(message.toJson()).then((value) =>
+        sendPushNotification(chatuser, type == Type.text ? msg : 'image'));
   }
 
 // Update read status of msg.
@@ -232,5 +315,26 @@ class APIs {
     // updating image in firestore database
     final imageUrl = await ref.getDownloadURL();
     await sendMessage(chatUser, imageUrl, Type.image);
+  }
+
+// for deleting msg
+
+  static Future<void> deleteMsg(Message message) async {
+    await firestore
+        .collection('chats/${getConversationID(message.toId)}/message/')
+        .doc(message.sent)
+        .delete();
+    if (message.type == Type.image) {
+      await storage.refFromURL(message.msg).delete();
+    }
+  }
+
+  // Update msg
+  static Future<void> UpdateMsg(Message message, updatedMsg, context) async {
+    await firestore
+        .collection('chats/${getConversationID(message.toId)}/message/')
+        .doc(message.sent)
+        .update({'msg': updatedMsg});
+    // Navigator.pop(context);
   }
 }

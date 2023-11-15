@@ -96,7 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Stack(
         children: [
           AnimatedPositioned(
-              duration: Duration(seconds: 2),
+              duration: Duration(seconds: 1),
               top: mq.height * .15,
               right: _isAnimate ? mq.width * .25 : -mq.width * .5,
               width: mq.width * .5,
